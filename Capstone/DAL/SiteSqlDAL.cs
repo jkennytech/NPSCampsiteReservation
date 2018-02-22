@@ -22,6 +22,21 @@ namespace Capstone.DAL
         {
             List<Site> output = new List<Site>();
 
+            string arrivalMonth = arrivalDate.ToString().Substring(0, 2);
+            if(arrivalMonth.Contains('/'))
+            {
+                arrivalMonth = arrivalMonth[0].ToString();
+            }
+            int arrivalMonthInt = int.Parse(arrivalMonth);
+
+            string departureMonth = departureDate.ToString().Substring(0, 2);
+            if(departureMonth.Contains('/'))
+            {
+                departureMonth = departureMonth[0].ToString();
+            }
+            int departureMonthInt = int.Parse(departureMonth);
+
+
             try
             {
 
@@ -29,11 +44,13 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM site WHERE campground_id = @campid ORDER BY site_id;", conn);
+                    //SqlCommand cmd = new SqlCommand("SELECT * FROM site WHERE campground_id = @campid ORDER BY site_id;", conn);
+
+                    SqlCommand cmd = new SqlCommand("SELECT * FROM site JOIN campground ON campground.campground_id = site.campground_id WHERE campground.campground_id = @campid  AND @arrival >= campground.open_from_mm AND @arrival <= campground.open_to_mm AND @departure >= campground.open_from_mm AND @departure <= campground.open_to_mm; ", conn);
 
                     cmd.Parameters.AddWithValue("@campid", campgroundId);
-                    cmd.Parameters.AddWithValue("@arrival", arrivalDate);
-                    cmd.Parameters.AddWithValue("@departure", departureDate);
+                    cmd.Parameters.AddWithValue("@arrival", arrivalMonthInt);
+                    cmd.Parameters.AddWithValue("@departure", departureMonthInt);
 
 
                     SqlDataReader reader = cmd.ExecuteReader();
