@@ -11,7 +11,6 @@ namespace Capstone
     {
         static void Main(string[] args)
         {
-
             // Use this so that you don't need to copy your connection string all over your code!            
             // ConfigurationManager opens up the App.config file and looks for an entry called "CapstoneDatabase".
             //     <add name="CapstoneDatabase" connectionString=""/>
@@ -20,7 +19,6 @@ namespace Capstone
 
             ProjectCLI cli = new ProjectCLI(connectionString);
             cli.RunCLI();
-
         }
     }
 }

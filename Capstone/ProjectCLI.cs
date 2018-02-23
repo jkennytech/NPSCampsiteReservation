@@ -358,8 +358,6 @@ namespace Capstone
                 {
                     break;
                 }
-
-
             }
         }
 
@@ -371,7 +369,6 @@ namespace Capstone
             Console.Clear();
         }
 
-
         private void DisplaySitesMatchingSearchCriteriaSelectMenu(string campId, DateTime arrivalDate, DateTime departureDate) // Add datetimes for arrival and departure?
         {
             while(true)
@@ -382,18 +379,15 @@ namespace Capstone
                 PrintHeader();
                 string accessible;
                 string utility;
-                int confirmationID = -1;
-                
+                int confirmationID = -1;                
 
                 Console.Clear();
-
 
                 if (sites.Count > 0)
                 {
                     Console.WriteLine(("Site No.").PadRight(12) + ("Max Occup.").PadRight(12) + ("Accessible?").PadRight(20) + ("Max RV Length").PadRight(20) + ("Utility").PadRight(12) + ("Cost of Stay").PadRight(12));
                     foreach (Site site in sites)
                     {
-
                         TimeSpan timeSpan = departureDate.Subtract(arrivalDate);
                         int totalDays = (int)timeSpan.TotalDays;
                         decimal cost = totalDays * site.Daily_Fee;
@@ -453,8 +447,6 @@ namespace Capstone
                             Freeze();
                         }
                     }
-
-
                        
                     Console.Write("Enter any key to add another reservation or Enter (X) to EXIT ");
                     char userInput = Console.ReadKey(false).KeyChar;
@@ -463,8 +455,6 @@ namespace Capstone
                         Console.WriteLine();
                         Environment.Exit(0);
                     }
-
-
                 }
 
                 else
@@ -473,12 +463,7 @@ namespace Capstone
                     Freeze();
                     break;
                 }
-
             }
-
         }
-
-
-
     }
 }

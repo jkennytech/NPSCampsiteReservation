@@ -15,8 +15,5 @@ namespace Capstone.Models
         public int Area { get; set; }
         public int Visitors { get; set; }
         public string Description { get; set; }
-
     }
-
-
 }

@@ -24,7 +24,6 @@ namespace Capstone.DAL
 
             try
             {
-
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
@@ -48,6 +47,7 @@ namespace Capstone.DAL
                     }
                 }
             }
+
             catch (SqlException ex)
             {
                 Console.WriteLine("There was an error booking the reservation: " + ex.Message);

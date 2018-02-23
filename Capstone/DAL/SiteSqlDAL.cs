@@ -28,19 +28,15 @@ namespace Capstone.DAL
                 arrivalMonth = arrivalMonth[0].ToString();
             }
             int arrivalMonthInt = int.Parse(arrivalMonth);
-
             string departureMonth = departureDate.ToString().Substring(0, 2);
             if(departureMonth.Contains('/'))
             {
                 departureMonth = departureMonth[0].ToString();
             }
-            int departureMonthInt = int.Parse(departureMonth);
-
-            
+            int departureMonthInt = int.Parse(departureMonth);            
 
             try
             {
-
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
@@ -52,7 +48,6 @@ namespace Capstone.DAL
                     cmd.Parameters.AddWithValue("@departure", departureMonthInt);
                     cmd.Parameters.AddWithValue("@arrivalDate", arrivalDate);
                     cmd.Parameters.AddWithValue("@departureDate", departureDate);
-
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -72,6 +67,7 @@ namespace Capstone.DAL
                     }
                 }
             }
+
             catch(SqlException ex)
             {
                 Console.WriteLine("An error occurred while reading from the database: " + ex.Message);
@@ -79,8 +75,6 @@ namespace Capstone.DAL
             }
 
             return output;
-
         }
-
     }
 }

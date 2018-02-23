@@ -47,12 +47,12 @@ namespace Capstone.DAL
                     }
                 }
             }
+
             catch(SqlException ex)
             {
                 Console.WriteLine("An error occurred while reading from the database: " + ex.Message);
                 throw;
             }
-
 
             return output;
         }

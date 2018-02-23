@@ -46,15 +46,13 @@ namespace Capstone.DAL
 
                         output.Add(c);
                     }
-
-
                 }
             }
+
             catch(SqlException ex)
             {
                 Console.WriteLine("An error occurred while reading the database: " + ex.Message);
             }
-
 
             return output;
         }
