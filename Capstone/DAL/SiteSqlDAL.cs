@@ -45,9 +45,7 @@ namespace Capstone.DAL
                 {
                     conn.Open();
 
-                    //SqlCommand cmd = new SqlCommand("SELECT * FROM site WHERE campground_id = @campid ORDER BY site_id;", conn);
-
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM site JOIN campground ON campground.campground_id = site.campground_id JOIN reservation ON reservation.site_id = site.site_id WHERE campground.campground_id = @campid  AND @arrival >= campground.open_from_mm AND @arrival <= campground.open_to_mm AND @departure >= campground.open_from_mm AND @departure <= campground.open_to_mm AND ((@arrivalDate > reservation.from_date OR @arrivalDate < reservation.to_date) AND (@departureDate > reservation.from_date OR @departureDate < reservation.to_date));", conn);
+                    SqlCommand cmd = new SqlCommand("SELECT TOP 5 site.site_id, site.site_number, site.max_occupancy, site.accessible, site.max_rv_length, site.utilities, campground.daily_fee FROM site LEFT JOIN campground ON site.campground_id = campground.campground_id WHERE site.site_id NOT IN (SELECT reservation.site_id FROM reservation WHERE((reservation.from_date >= @arrivalDate  AND reservation.from_date < @departureDate) OR(reservation.to_date > @arrivalDate AND reservation.to_date <= @departureDate) OR(reservation.from_date <= @arrivalDate AND reservation.to_date >= @departureDate))) AND(@arrival >= campground.open_from_mm AND @arrival <= campground.open_to_mm) AND(@departure >= campground.open_from_mm AND @departure <= campground.open_to_mm) AND campground.campground_id = @campid;", conn);
 
                     cmd.Parameters.AddWithValue("@campid", campgroundId);
                     cmd.Parameters.AddWithValue("@arrival", arrivalMonthInt);
@@ -56,23 +54,19 @@ namespace Capstone.DAL
                     cmd.Parameters.AddWithValue("@departureDate", departureDate);
 
 
-                    //TimeSpan timeSpan = departureDate.Subtract(arrivalDate);
-                    //int totalDays = (int)timeSpan.TotalDays;
-                    //decimal cost = totalDays * campground.daily_fee;
-
-
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
                         Site s = new Site();
                         s.Site_Id = Convert.ToInt32(reader["site_id"]);
-                        s.Campground_Id = Convert.ToInt32(reader["campground_id"]);
+                        s.Campground_Id = Convert.ToInt32(campgroundId);
                         s.Site_Number = Convert.ToInt32(reader["site_number"]);
                         s.Max_Occupancy = Convert.ToInt32(reader["max_occupancy"]);
                         s.Accessible = Convert.ToBoolean(reader["accessible"]);
                         s.Max_Rv_Length = Convert.ToInt32(reader["max_rv_length"]);
                         s.Utilities = Convert.ToBoolean(reader["utilities"]);
+                        s.Daily_Fee = Convert.ToDecimal(reader["daily_fee"]);
                         
                         output.Add(s);
                     }

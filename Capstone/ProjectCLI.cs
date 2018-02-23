@@ -190,7 +190,11 @@ namespace Capstone
                 }
                 else if(userInput == "1")
                 {
-
+                    SearchForCampgroundReservation(parkId, parkName);
+                }
+                else if(userInput == "2")
+                {
+                    break;
                 }
 
 
@@ -220,9 +224,6 @@ namespace Capstone
                     string openDate = "Open (mm):";
                     string closeDate = "Close (mm):";
                     string dailyFee = "Daily Fee:";
-
-
-
 
                     Console.WriteLine($"{campgroundId.PadRight(5)}{name.PadRight(35)}{openDate.PadRight(20)}{closeDate.PadRight(20)}{dailyFee.PadRight(10)}");
                     foreach (Campground campground in campgrounds)
@@ -266,25 +267,43 @@ namespace Capstone
                     }
                 }
 
-                if (isValidCampground && canParseArrivalDate && canParseDepartureDate && userCampground != "0")
+                if (isValidCampground && canParseArrivalDate && canParseDepartureDate && userCampground != "0" && arrive <= depart)
                 {
                     DisplaySitesMatchingSearchCriteriaSelectMenu(userCampground, arrive, depart);
 
                 }
+                else if (!isValidCampground)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please Enter a Valid Campground ID#");
+                    Freeze();
+                }
+                else if (!canParseArrivalDate)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please Enter your arrival date in the correct format");
+                    Freeze();
+                }
+                else if (!canParseDepartureDate)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please Enter your departure date in the correct format");
+                    Freeze();
+                }
+                else if(arrive > depart)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Please Enter an arrival date that is an earlier date than the departure date.");
+                    Freeze();
+                }
                 else
                 {
                     Console.Clear();
-                    Console.WriteLine("Please enter valid inputs. At least one of your inputs is invalid");
+                    Console.WriteLine("At least one of your inputs is invalid. Please enter valid inputs.");
                     Freeze();
                 }
  
-
-
-
-
-
-
-
+            
             }
         }
 
@@ -362,35 +381,98 @@ namespace Capstone
                 List<Site> sites = dal.GetAllAvailableCampsites(campId, arrivalDate, departureDate);
                 PrintHeader();
                 string accessible;
-                string utility;                
+                string utility;
+                int confirmationID = -1;
+                
 
-                Console.WriteLine(("Site No.").PadRight(12) + ("Max Occup.").PadRight(12) + ("Accessible?").PadRight(20) + ("Max RV Length").PadRight(20) + ("Utility").PadRight(12) + ("Cost").PadRight(5));
-                foreach (Site site in sites)
+                Console.Clear();
+
+
+                if (sites.Count > 0)
                 {
-                    if(site.Campground_Id.ToString() == campId)
+                    Console.WriteLine(("Site No.").PadRight(12) + ("Max Occup.").PadRight(12) + ("Accessible?").PadRight(20) + ("Max RV Length").PadRight(20) + ("Utility").PadRight(12) + ("Cost of Stay").PadRight(12));
+                    foreach (Site site in sites)
                     {
-                        if(site.Accessible)
-                        {
-                            accessible = "Yes";
-                        }
-                        else
-                        {
-                            accessible = "No";
-                        }
-                        if(site.Utilities)
-                        {
-                            utility = "Yes";
-                        }
-                        else
-                        {
-                            utility = "N/A";
-                        }
 
-                        Console.WriteLine(site.Site_Number.ToString().PadRight(12) + site.Max_Occupancy.ToString().PadRight(12) + accessible.PadRight(20) + site.Max_Rv_Length.ToString().PadRight(20) + utility.PadRight(12) + "$XX");
+                        TimeSpan timeSpan = departureDate.Subtract(arrivalDate);
+                        int totalDays = (int)timeSpan.TotalDays;
+                        decimal cost = totalDays * site.Daily_Fee;
+
+                        if (site.Campground_Id.ToString() == campId)
+                        {
+                            if (site.Accessible)
+                            {
+                                accessible = "Yes";
+                            }
+                            else
+                            {
+                                accessible = "No";
+                            }
+                            if (site.Utilities)
+                            {
+                                utility = "Yes";
+                            }
+                            else
+                            {
+                                utility = "N/A";
+                            }
+
+                            Console.WriteLine(site.Site_Number.ToString().PadRight(12) + site.Max_Occupancy.ToString().PadRight(12) + accessible.PadRight(20) + site.Max_Rv_Length.ToString().PadRight(20) + utility.PadRight(12) + cost.ToString("C").PadRight(12));
+                        }
                     }
+
+                    Console.WriteLine();
+                    Console.Write("Which site should be reserved (enter 0 to cancel)? ");
+                    string userInputSiteId = Console.ReadLine();
+
+                    if(userInputSiteId == "0")
+                    {
+                        Console.Clear();
+                        break;
+                    }
+
+                    Console.Write("What name should the reservation be made under?" );
+                    string userInputName = Console.ReadLine();
+
+                    ReservationSqlDAL dalRes = new ReservationSqlDAL(connectionString);
+                    
+                    foreach(Site site in sites)
+                    {
+                        if(userInputSiteId == site.Site_Number.ToString())
+                        {
+                            confirmationID = dalRes.BookReservation(site.Site_Id, userInputName, arrivalDate, departureDate);
+                            Console.WriteLine();
+                            Console.WriteLine($"The Reservation has been made for {userInputName} and the Confirmation ID# is {confirmationID}");
+                            Freeze();
+                            break;
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("You entered an invalid ID");
+                            Freeze();
+                        }
+                    }
+
+
+                       
+                    Console.Write("Enter any key to add another reservation or Enter (X) to EXIT ");
+                    char userInput = Console.ReadKey(false).KeyChar;
+                    if(userInput.ToString().ToLower() == "x")
+                    {
+                        Console.WriteLine();
+                        Environment.Exit(0);
+                    }
+
+
                 }
 
-                Console.ReadLine();
+                else
+                {
+                    Console.WriteLine("****THERE ARE CURRENTLY NO AVAILABLE CAMPSITES IN THAT CAMPGROUND IN THAT TIME PERIOD****");
+                    Freeze();
+                    break;
+                }
 
             }
 
