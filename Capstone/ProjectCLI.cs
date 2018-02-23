@@ -261,96 +261,116 @@ namespace Capstone
                     Console.Clear();
                     break;
                 }
+
                 //else if(userCampground)
                 bool canParse = int.TryParse(userCampground, out int num);
-                Console.Write("What is the arrival date? (mm/dd/yyyy) ");
-                userDateArrive = Console.ReadLine();
-                bool canParseArrivalDate = DateTime.TryParse(userDateArrive, out DateTime arrive);
-                Console.Write("What is the departure date? (mm/dd/yyyy)");
-                userDateDepart = Console.ReadLine();
-                bool canParseDepartureDate = DateTime.TryParse(userDateDepart, out DateTime depart);
+                bool containsID = false;
 
-                TimeSpan timeSpan = depart.Subtract(arrive);
-                int totalDaysOfStay = (int)timeSpan.TotalDays;
-                int totalPossibleDaysLeftInSeason = 0;
-                bool stayPastBoundaries = false;
-
-                Console.Clear();
-
-                if (canParse)
-                {
-                    foreach (Campground campground in campgrounds)
-                    {
-                        if (campground.Campground_Id == num)
-                        {
-                            isValidCampground = true;
-                            //DateTime campSeasonStart = DateTime.Parse($"{campground.Open_From_Mm}/01/2018");
-                            DateTime campSeasonEnd = DateTime.Parse($"{campground.Open_To_Mm}/{daysInMonth[campground.Open_To_Mm]}/{arrive.Year}");
-                            timeSpan = campSeasonEnd.Subtract(arrive);
-                            totalPossibleDaysLeftInSeason = (int)timeSpan.TotalDays;
-                            if(totalPossibleDaysLeftInSeason < totalDaysOfStay)
-                            {
-                                stayPastBoundaries = true;
-                            }
-
-                            if (campground.Open_From_Mm == 1 && campground.Open_To_Mm == 12)
-                            {
-                                stayPastBoundaries = false;
-                            }
-                        }
-                    }
-                }
-
-                
-
-                //if(stayPastBoundaries)
-                //{
-                //    if(arrive.Year != depart.Year)
-                //    {
-                //        stayPastBoundaries = false;
-                //    }
-                //}
-
-                if (isValidCampground && canParseArrivalDate && canParseDepartureDate && userCampground != "0" && arrive <= depart && !stayPastBoundaries)
-                {
-                    DisplaySitesMatchingSearchCriteriaSelectMenu(userCampground, arrive, depart);
-
-                }
-                else if (!isValidCampground)
+                if (!canParse)
                 {
                     Console.Clear();
                     Console.WriteLine("Please Enter a Valid Campground ID#");
                     Freeze();
                 }
-                else if (!canParseArrivalDate)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Please Enter your arrival date in the correct format");
-                    Freeze();
-                }
-                else if (!canParseDepartureDate)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Please Enter your departure date in the correct format");
-                    Freeze();
-                }
-                else if(arrive > depart)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Please Enter an arrival date that is an earlier date than the departure date.");
-                    Freeze();
-                }
-                else if(stayPastBoundaries)
-                {
-                    Console.Clear();
-                    Console.WriteLine("The camp will close during your stay. Please select a smaller date-range");
-                    Freeze();
-                }
                 else
                 {
-                    Console.Clear();
-                    Console.WriteLine("At least one of your inputs is invalid. Please enter valid inputs.");
-                    Freeze();
+                    foreach (Campground campground in campgrounds)
+                    {
+                        if (campground.Campground_Id == num)
+                        {
+                            containsID = true;
+                        }
+                    }
+                    if(!containsID)
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Please Enter a Valid Campground ID#");
+                        Freeze();
+                    }
+                    else
+                    {
+
+                        Console.Write("What is the arrival date? (mm/dd/yyyy) ");
+                        userDateArrive = Console.ReadLine();
+                        bool canParseArrivalDate = DateTime.TryParse(userDateArrive, out DateTime arrive);
+                        Console.Write("What is the departure date? (mm/dd/yyyy)");
+                        userDateDepart = Console.ReadLine();
+                        bool canParseDepartureDate = DateTime.TryParse(userDateDepart, out DateTime depart);
+
+                        TimeSpan timeSpan = depart.Subtract(arrive);
+                        int totalDaysOfStay = (int)timeSpan.TotalDays;
+                        int totalPossibleDaysLeftInSeason = 0;
+                        bool stayPastBoundaries = false;
+
+                        Console.Clear();
+
+                        if (canParse)
+                        {
+                            foreach (Campground campground in campgrounds)
+                            {
+                                if (campground.Campground_Id == num)
+                                {
+                                    isValidCampground = true;
+                                    //DateTime campSeasonStart = DateTime.Parse($"{campground.Open_From_Mm}/01/2018");
+                                    DateTime campSeasonEnd = DateTime.Parse($"{campground.Open_To_Mm}/{daysInMonth[campground.Open_To_Mm]}/{arrive.Year}");
+                                    timeSpan = campSeasonEnd.Subtract(arrive);
+                                    totalPossibleDaysLeftInSeason = (int)timeSpan.TotalDays;
+                                    if (totalPossibleDaysLeftInSeason < totalDaysOfStay)
+                                    {
+                                        stayPastBoundaries = true;
+                                    }
+
+                                    if (campground.Open_From_Mm == 1 && campground.Open_To_Mm == 12)
+                                    {
+                                        stayPastBoundaries = false;
+                                    }
+                                }
+                            }
+                        }
+
+
+                        if (isValidCampground && canParseArrivalDate && canParseDepartureDate && userCampground != "0" && arrive <= depart && !stayPastBoundaries)
+                        {
+                            DisplaySitesMatchingSearchCriteriaSelectMenu(userCampground, arrive, depart);
+
+                        }
+                        else if (!isValidCampground)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Please Enter a Valid Campground ID#");
+                            Freeze();
+                        }
+                        else if (!canParseArrivalDate)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Please Enter your arrival date in the correct format");
+                            Freeze();
+                        }
+                        else if (!canParseDepartureDate)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Please Enter your departure date in the correct format");
+                            Freeze();
+                        }
+                        else if (arrive > depart)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Please Enter an arrival date that is an earlier date than the departure date.");
+                            Freeze();
+                        }
+                        else if (stayPastBoundaries)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("The camp will close during your stay. Please select a smaller date-range");
+                            Freeze();
+                        }
+                        else
+                        {
+                            Console.Clear();
+                            Console.WriteLine("At least one of your inputs is invalid. Please enter valid inputs.");
+                            Freeze();
+                        }
+                    }
                 }
  
             
