@@ -54,7 +54,7 @@ namespace Capstone.DAL
                     cmd.Parameters.AddWithValue("@departure", departureMonthInt);
                     cmd.Parameters.AddWithValue("@arrivalDate", arrivalDate);
                     cmd.Parameters.AddWithValue("@departureDate", departureDate);
-                    
+
 
                     //TimeSpan timeSpan = departureDate.Subtract(arrivalDate);
                     //int totalDays = (int)timeSpan.TotalDays;
