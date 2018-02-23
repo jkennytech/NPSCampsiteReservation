@@ -36,6 +36,7 @@ namespace Capstone.DAL
             }
             int departureMonthInt = int.Parse(departureMonth);
 
+            
 
             try
             {
@@ -46,11 +47,18 @@ namespace Capstone.DAL
 
                     //SqlCommand cmd = new SqlCommand("SELECT * FROM site WHERE campground_id = @campid ORDER BY site_id;", conn);
 
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM site JOIN campground ON campground.campground_id = site.campground_id WHERE campground.campground_id = @campid  AND @arrival >= campground.open_from_mm AND @arrival <= campground.open_to_mm AND @departure >= campground.open_from_mm AND @departure <= campground.open_to_mm; ", conn);
+                    SqlCommand cmd = new SqlCommand("SELECT * FROM site JOIN campground ON campground.campground_id = site.campground_id JOIN reservation ON reservation.site_id = site.site_id WHERE campground.campground_id = @campid  AND @arrival >= campground.open_from_mm AND @arrival <= campground.open_to_mm AND @departure >= campground.open_from_mm AND @departure <= campground.open_to_mm AND ((@arrivalDate > reservation.from_date OR @arrivalDate < reservation.to_date) AND (@departureDate > reservation.from_date OR @departureDate < reservation.to_date));", conn);
 
                     cmd.Parameters.AddWithValue("@campid", campgroundId);
                     cmd.Parameters.AddWithValue("@arrival", arrivalMonthInt);
                     cmd.Parameters.AddWithValue("@departure", departureMonthInt);
+                    cmd.Parameters.AddWithValue("@arrivalDate", arrivalDate);
+                    cmd.Parameters.AddWithValue("@departureDate", departureDate);
+                    
+
+                    //TimeSpan timeSpan = departureDate.Subtract(arrivalDate);
+                    //int totalDays = (int)timeSpan.TotalDays;
+                    //decimal cost = totalDays * campground.daily_fee;
 
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -65,7 +73,7 @@ namespace Capstone.DAL
                         s.Accessible = Convert.ToBoolean(reader["accessible"]);
                         s.Max_Rv_Length = Convert.ToInt32(reader["max_rv_length"]);
                         s.Utilities = Convert.ToBoolean(reader["utilities"]);
-
+                        
                         output.Add(s);
                     }
                 }

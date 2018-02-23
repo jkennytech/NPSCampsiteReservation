@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Capstone.DAL;
 using Capstone.Models;
+using System.Data.Sql;
 
 namespace Capstone
 {
@@ -352,16 +353,16 @@ namespace Capstone
         }
 
 
-        private void DisplaySitesMatchingSearchCriteriaSelectMenu(string campId, DateTime arrivalDate, DateTime departureDate) // Add datetimes for arrival and depatture?
+        private void DisplaySitesMatchingSearchCriteriaSelectMenu(string campId, DateTime arrivalDate, DateTime departureDate) // Add datetimes for arrival and departure?
         {
             while(true)
             {
                 SiteSqlDAL dal = new SiteSqlDAL(connectionString);
+                SiteSqlDAL dal2 = new SiteSqlDAL(connectionString);
                 List<Site> sites = dal.GetAllAvailableCampsites(campId, arrivalDate, departureDate);
                 PrintHeader();
                 string accessible;
-                string utility;
-
+                string utility;                
 
                 Console.WriteLine(("Site No.").PadRight(12) + ("Max Occup.").PadRight(12) + ("Accessible?").PadRight(20) + ("Max RV Length").PadRight(20) + ("Utility").PadRight(12) + ("Cost").PadRight(5));
                 foreach (Site site in sites)
@@ -384,6 +385,7 @@ namespace Capstone
                         {
                             utility = "N/A";
                         }
+
                         Console.WriteLine(site.Site_Number.ToString().PadRight(12) + site.Max_Occupancy.ToString().PadRight(12) + accessible.PadRight(20) + site.Max_Rv_Length.ToString().PadRight(20) + utility.PadRight(12) + "$XX");
                     }
                 }
