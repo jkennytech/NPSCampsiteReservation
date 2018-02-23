@@ -209,3 +209,70 @@ ALTER TABLE campground ADD FOREIGN KEY (park_id) REFERENCES park(park_id);
 ALTER TABLE site ADD FOREIGN KEY (campground_id) REFERENCES campground(campground_id);
 ALTER TABLE reservation ADD FOREIGN KEY (site_id) REFERENCES site(site_id);
 
+
+
+SELECT * 
+FROM reservation
+JOIN site ON SITE.site_id = reservation.site_id
+JOIN campground ON campground.campground_id = site.campground_id
+WHERE campground.campground_id = 1 AND ((reservation.from_date >= '2018-02-21'  AND reservation.from_date < '2018-02-22') OR (reservation.to_date > '2018-02-21' AND reservation.to_date <= '2018-02-22') OR (reservation.from_date <= '2018-02-21' AND reservation.to_date >= '2018-02-22'));
+
+
+SELECT * FROM reservation;
+
+
+SELECT *
+FROM site
+JOIN campground ON site.campground_id = campground.campground_id
+WHERE campground.campground_id = 1 AND site.site_id != 1 AND site.site_id != 2 AND site.site_id != 7;
+
+SELECT *
+FROM site
+JOIN campground ON site.campground_id = campground.campground_id
+WHERE campground.campground_id = 1 AND site.site_id NOT IN (SELECT reservation.site_id 
+FROM reservation
+JOIN site ON SITE.site_id = reservation.site_id
+JOIN campground ON campground.campground_id = site.campground_id
+WHERE campground.campground_id = 1 AND ((reservation.from_date >= '2018-01-01'  AND reservation.from_date < '2018-03-31') OR (reservation.to_date > '2018-01-01' AND reservation.to_date <= '2018-03-31') OR (reservation.from_date <= '2018-01-01' AND reservation.to_date >= '2018-03-31')));
+
+
+
+SELECT * FROM site;
+
+SELECT * FROM campground;
+
+--My Query
+SELECT *
+FROM site
+LEFT JOIN campground ON site.campground_id = campground.campground_id
+WHERE site.site_id NOT IN (SELECT reservation.site_id 
+FROM reservation
+WHERE ((reservation.from_date >= '2018-01-01'  AND reservation.from_date < '2018-03-31') 
+OR (reservation.to_date > '2018-01-01' AND reservation.to_date <= '2018-03-31') 
+OR (reservation.from_date <= '2018-01-01' AND reservation.to_date >= '2018-03-31')))
+AND (1 >= campground.open_from_mm 
+AND 1 <= campground.open_to_mm) 
+AND (3 >= campground.open_from_mm 
+AND 3 <= campground.open_to_mm) 
+AND campground.campground_id = 1;
+-- End My Query
+
+SELECT site.site_id, site.site_number, site.max_occupancy, site.accessible, site.max_rv_length, site.utilities, campground.daily_fee 
+FROM campground 
+LEFT JOIN site ON campground.campground_id = site.campground_id 
+WHERE site.site_id NOT IN (SELECT reservation.site_id 
+FROM reservation 
+WHERE('2018-1-1' >= reservation.from_date OR '2018-1-1' <= reservation.to_date) 
+AND ('2018-3-31' >= reservation.from_date OR '2018-3-31' <= reservation.to_date) 
+AND (reservation.from_date >= '2018-1-1') 
+AND (reservation.to_date <= '2018-3-31')) 
+AND (MONTH('2018-1-1') >= campground.open_from_mm AND (MONTH('2018-1-1')) <= campground.open_to_mm) 
+AND ((MONTH('2018-3-31')) >= campground.open_from_mm AND (MONTH('2018-3-31')) <= campground.open_to_mm) 
+AND campground.campground_id = 1
+
+
+
+--campground.campground_id = 1 AND 
+-- JOIN site ON SITE.site_id = reservation.site_id
+--LEFT JOIN campground ON campground.campground_id = site.campground_id
+-- campground.campground_id = 1 ADD BACK TO BEGINNING OF LAST QUERY

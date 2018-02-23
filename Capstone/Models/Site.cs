@@ -15,6 +15,7 @@ namespace Capstone.Models
         public bool Accessible { get; set; }
         public int Max_Rv_Length { get; set; }
         public bool Utilities { get; set; }
+        public decimal Daily_Fee { get; set; }
 
         public Site()
         {
