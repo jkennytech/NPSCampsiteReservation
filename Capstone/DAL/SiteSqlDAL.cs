@@ -22,6 +22,8 @@ namespace Capstone.DAL
         {
             List<Site> output = new List<Site>();
 
+            
+
             string arrivalMonth = arrivalDate.ToString().Substring(0, 2);
             if(arrivalMonth.Contains('/'))
             {

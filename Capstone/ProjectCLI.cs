@@ -29,6 +29,22 @@ namespace Capstone
             {12, "December" }
         };
 
+        static Dictionary<int, int> daysInMonth = new Dictionary<int, int>()
+        {
+            {1, 31 },
+            {2, 28 },
+            {3, 31 },
+            {4, 30 },
+            {5, 31 },
+            {6, 30 },
+            {7, 31 },
+            {8, 31 },
+            {9, 30 },
+            {10, 31 },
+            {11, 30 },
+            {12, 31 }
+        };
+
         public ProjectCLI(string dBConnection)
         {
             connectionString = dBConnection;
@@ -164,7 +180,6 @@ namespace Capstone
                     foreach (Campground campground in campgrounds)
                     {
                         Console.WriteLine($"#{campground.Campground_Id.ToString().PadRight(4)}{campground.Name.PadRight(35)}{numberMonth[campground.Open_From_Mm].PadRight(20)}{numberMonth[campground.Open_To_Mm].PadRight(20)}{campground.Daily_Fee.ToString("C").PadRight(10)}");
-
                     }
 
                 }
@@ -246,6 +261,7 @@ namespace Capstone
                     Console.Clear();
                     break;
                 }
+                //else if(userCampground)
                 bool canParse = int.TryParse(userCampground, out int num);
                 Console.Write("What is the arrival date? (mm/dd/yyyy) ");
                 userDateArrive = Console.ReadLine();
@@ -253,6 +269,11 @@ namespace Capstone
                 Console.Write("What is the departure date? (mm/dd/yyyy)");
                 userDateDepart = Console.ReadLine();
                 bool canParseDepartureDate = DateTime.TryParse(userDateDepart, out DateTime depart);
+
+                TimeSpan timeSpan = depart.Subtract(arrive);
+                int totalDaysOfStay = (int)timeSpan.TotalDays;
+                int totalPossibleDaysLeftInSeason = 0;
+                bool stayPastBoundaries = false;
 
                 Console.Clear();
 
@@ -263,11 +284,34 @@ namespace Capstone
                         if (campground.Campground_Id == num)
                         {
                             isValidCampground = true;
+                            //DateTime campSeasonStart = DateTime.Parse($"{campground.Open_From_Mm}/01/2018");
+                            DateTime campSeasonEnd = DateTime.Parse($"{campground.Open_To_Mm}/{daysInMonth[campground.Open_To_Mm]}/{arrive.Year}");
+                            timeSpan = campSeasonEnd.Subtract(arrive);
+                            totalPossibleDaysLeftInSeason = (int)timeSpan.TotalDays;
+                            if(totalPossibleDaysLeftInSeason < totalDaysOfStay)
+                            {
+                                stayPastBoundaries = true;
+                            }
+
+                            if (campground.Open_From_Mm == 1 && campground.Open_To_Mm == 12)
+                            {
+                                stayPastBoundaries = false;
+                            }
                         }
                     }
                 }
 
-                if (isValidCampground && canParseArrivalDate && canParseDepartureDate && userCampground != "0" && arrive <= depart)
+                
+
+                //if(stayPastBoundaries)
+                //{
+                //    if(arrive.Year != depart.Year)
+                //    {
+                //        stayPastBoundaries = false;
+                //    }
+                //}
+
+                if (isValidCampground && canParseArrivalDate && canParseDepartureDate && userCampground != "0" && arrive <= depart && !stayPastBoundaries)
                 {
                     DisplaySitesMatchingSearchCriteriaSelectMenu(userCampground, arrive, depart);
 
@@ -294,6 +338,12 @@ namespace Capstone
                 {
                     Console.Clear();
                     Console.WriteLine("Please Enter an arrival date that is an earlier date than the departure date.");
+                    Freeze();
+                }
+                else if(stayPastBoundaries)
+                {
+                    Console.Clear();
+                    Console.WriteLine("The camp will close during your stay. Please select a smaller date-range");
                     Freeze();
                 }
                 else
